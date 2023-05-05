@@ -1,4 +1,4 @@
-﻿namespace OOP10
+namespace OOP10
 {
     internal class Program
     {
@@ -42,10 +42,10 @@
         {
             List<Hungary> hungarySquad = new List<Hungary>
             {
-                new Wrestler(nameof(Wrestler), 444, 20, 100),
-                new Kickboxer(nameof(Kickboxer), 380, 15),
-                new Boxer(nameof(Boxer), 400, 20),
-                new SumoWrestler(nameof(SumoWrestler), 350, 15),
+                new Wrestler(nameof(Wrestler), 1, 20, 100),
+                new Kickboxer(nameof(Kickboxer), 1, 15),
+                new Boxer(nameof(Boxer), 1, 20),
+                new SumoWrestler(nameof(SumoWrestler), 1, 15),
             };
 
             List<Romania> romaniaSquad = new List<Romania>
@@ -63,33 +63,30 @@
         {
             while (hungarySquad.Count > 0 && romaniaSquad.Count > 0)
             {
-                if (hungarySquad.Count >= 0 & romaniaSquad.Count >= 0 && 0 < hungarySquad.Count & 0 < romaniaSquad.Count)
-                {
-                    Console.WriteLine();
+                Console.WriteLine();
 
-                    ShowListHungarySquad(hungarySquad);
+                ShowListHungarySquad(hungarySquad);
 
-                    int numberHungarySquad = _random.Next(hungarySquad.Count);
+                int numberHungarySquad = _random.Next(hungarySquad.Count);
 
-                    Hungary hungary = hungarySquad[numberHungarySquad];
+                Hungary hungary = hungarySquad[numberHungarySquad];
 
-                    Console.WriteLine("\nВы выбрали бойца - " + hungary.NameState);
-                    Console.WriteLine("Для продолжения нажмите любую клавишу...");
-                    Console.ReadKey();
-                    Console.WriteLine();
+                Console.WriteLine("\nВы выбрали бойца - " + hungary.NameState);
+                Console.WriteLine("Для продолжения нажмите любую клавишу...");
+                Console.ReadKey();
+                Console.WriteLine();
 
-                    ShowListRomaniaSquad(romaniaSquad);
+                ShowListRomaniaSquad(romaniaSquad);
 
-                    int numberRomaniaSquad = _random.Next(romaniaSquad.Count);
+                int numberRomaniaSquad = _random.Next(romaniaSquad.Count);
 
-                    Romania romania = romaniaSquad[numberRomaniaSquad];
+                Romania romania = romaniaSquad[numberRomaniaSquad];
 
-                    Console.WriteLine($"\nВы выбрали бойца - {romania.NameState}");
-                    Console.WriteLine("Для продолжения нажмите любую клавишу...");
-                    Console.ReadKey();
+                Console.WriteLine($"\nВы выбрали бойца - {romania.NameState}");
+                Console.WriteLine("Для продолжения нажмите любую клавишу...");
+                Console.ReadKey();
 
-                    FightSquads(hungarySquad, romaniaSquad, romania, hungary);
-                }
+                FightSquads(hungarySquad, romaniaSquad, romania, hungary);
 
                 ShowWinningCountry(hungarySquad, romaniaSquad);
             }
