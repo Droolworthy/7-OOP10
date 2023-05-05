@@ -42,10 +42,10 @@ namespace OOP10
         {
             List<Hungary> hungarySquad = new List<Hungary>
             {
-                new Wrestler(nameof(Wrestler), 1, 20, 100),
-                new Kickboxer(nameof(Kickboxer), 1, 15),
-                new Boxer(nameof(Boxer), 1, 20),
-                new SumoWrestler(nameof(SumoWrestler), 1, 15),
+                new Wrestler(nameof(Wrestler), 450, 20, 100),
+                new Kickboxer(nameof(Kickboxer), 500, 15),
+                new Boxer(nameof(Boxer), 375, 20),
+                new SumoWrestler(nameof(SumoWrestler), 330, 15),
             };
 
             List<Romania> romaniaSquad = new List<Romania>
