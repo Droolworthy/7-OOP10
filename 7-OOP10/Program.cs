@@ -20,7 +20,7 @@ namespace OOP10
 
                 if (CommandСhooseFighters == userInput)
                 {
-                    arena.Warfare();
+                    arena.FightingTakingPlace();
                 }
                 else if (userInput == CommandExit)
                 {
@@ -36,11 +36,11 @@ namespace OOP10
 
     class War
     {
-        Random _random = new Random();
+        private Random _random = new Random();
 
-        public void Warfare()
+        public void FightingTakingPlace()
         {
-            List<Hungary> hungarySquad = new List<Hungary>
+            List<Squad> hungarySquad = new List<Squad>
             {
                 new Wrestler(nameof(Wrestler), 450, 20, 100),
                 new Kickboxer(nameof(Kickboxer), 500, 15),
@@ -48,7 +48,7 @@ namespace OOP10
                 new SumoWrestler(nameof(SumoWrestler), 330, 15),
             };
 
-            List<Romania> romaniaSquad = new List<Romania>
+            List<Squad> romaniaSquad = new List<Squad>
             {
                 new Karateka(nameof(Karateka), 500, 22),
                 new TaekwondoPractitioner(nameof(TaekwondoPractitioner), 330, 30),
@@ -56,35 +56,21 @@ namespace OOP10
                 new Aikidoka(nameof(Aikidoka), 340, 25),
             };
 
-            ChooseFighters(hungarySquad, romaniaSquad);
-        }
-
-        private void ChooseFighters(List<Hungary> hungarySquad, List<Romania> romaniaSquad)
-        {
             while (hungarySquad.Count > 0 && romaniaSquad.Count > 0)
             {
-                Console.WriteLine();
-
-                ShowListHungarySquad(hungarySquad);
+                ShowListSquad(hungarySquad);
 
                 int numberHungarySquad = _random.Next(hungarySquad.Count);
+                Squad hungary = hungarySquad[numberHungarySquad];
 
-                Hungary hungary = hungarySquad[numberHungarySquad];
+                ChooseFighters(hungarySquad, hungary);
 
-                Console.WriteLine("\nВы выбрали бойца - " + hungary.NameState);
-                Console.WriteLine("Для продолжения нажмите любую клавишу...");
-                Console.ReadKey();
-                Console.WriteLine();
-
-                ShowListRomaniaSquad(romaniaSquad);
+                ShowListSquad(hungarySquad);
 
                 int numberRomaniaSquad = _random.Next(romaniaSquad.Count);
+                Squad romania = romaniaSquad[numberRomaniaSquad];
 
-                Romania romania = romaniaSquad[numberRomaniaSquad];
-
-                Console.WriteLine($"\nВы выбрали бойца - {romania.NameState}");
-                Console.WriteLine("Для продолжения нажмите любую клавишу...");
-                Console.ReadKey();
+                ChooseFighters(romaniaSquad, romania);
 
                 FightSquads(hungarySquad, romaniaSquad, romania, hungary);
 
@@ -92,12 +78,19 @@ namespace OOP10
             }
         }
 
-        private void FightSquads(List<Hungary> hungarySquad, List<Romania> romaniaSquad, Romania romania, Hungary hungary)
+        private void ChooseFighters(List<Squad> countrySquad, Squad nameFighter)
+        {
+            Console.WriteLine("\nВы выбрали бойца - " + nameFighter.Name);
+            Console.WriteLine("Для продолжения нажмите любую клавишу...");
+            Console.ReadKey();
+        }
+
+        private void FightSquads(List<Squad> hungarySquad, List<Squad> romaniaSquad, Squad romania, Squad hungary)
         {
             Console.WriteLine("\nВОЙНА НАЧИНАЕТСЯ!");
             Console.WriteLine();
 
-            while (hungary.HealthState > 0 && romania.HealthState > 0)
+            while (hungary.Health > 0 && romania.Health > 0)
             {
                 hungary.Attack(romania);
                 romania.Attack(hungary);
@@ -110,11 +103,11 @@ namespace OOP10
             }
         }
 
-        private void ShowWinningSquad(List<Hungary> hungarySquad, List<Romania> romaniaSquad, Romania romania, Hungary hungary)
+        private void ShowWinningSquad(List<Squad> hungarySquad, List<Squad> romaniaSquad, Squad romania, Squad hungary)
         {
-            if (hungary.HealthState <= 0)
+            if (hungary.Health <= 0)
             {
-                if (romania.HealthState <= 0)
+                if (romania.Health <= 0)
                 {
                     hungarySquad.Remove(hungary);
                     romaniaSquad.Remove(romania);
@@ -125,12 +118,12 @@ namespace OOP10
                 {
                     hungarySquad.Remove(hungary);
 
-                    Console.WriteLine("\nПобеда бойца - " + romania.NameState);
+                    Console.WriteLine("\nПобеда бойца - " + romania.Name);
                 }
             }
-            else if (romania.HealthState <= 0)
+            else if (romania.Health <= 0)
             {
-                if (hungary.HealthState <= 0)
+                if (hungary.Health <= 0)
                 {
                     hungarySquad.Remove(hungary);
                     romaniaSquad.Remove(romania);
@@ -141,12 +134,12 @@ namespace OOP10
                 {
                     romaniaSquad.Remove(romania);
 
-                    Console.WriteLine("\nПобеда бойца - " + hungary.NameState);
+                    Console.WriteLine("\nПобеда бойца - " + hungary.Name);
                 }
             }
         }
 
-        private void ShowWinningCountry(List<Hungary> hungarySquad, List<Romania> romaniaSquad)
+        private void ShowWinningCountry(List<Squad> hungarySquad, List<Squad> romaniaSquad)
         {
             if (hungarySquad.Count <= 0 & romaniaSquad.Count <= 0)
             {
@@ -155,75 +148,42 @@ namespace OOP10
             }
             else if (hungarySquad.Count <= 0)
             {
-                Console.WriteLine("\nСтрана " + (nameof(Romania)) + " побеждает!");
+                Console.WriteLine("\nСтрана Румыния побеждает!");
                 return;
             }
             else if (romaniaSquad.Count <= 0)
             {
-                Console.WriteLine("\nСтрана " + (nameof(Hungary)) + " побеждает!");
+                Console.WriteLine("\nСтрана Венгрия побеждает!");
                 return;
             }
         }
 
-        private void ShowListRomaniaSquad(List<Romania> romaniaSquad)
+        private void ShowListSquad(List<Squad> fighters)
         {
-            Console.WriteLine($"Список бойцов страны {nameof(Romania)}:");
+            Console.WriteLine($"\nСписок бойцов:");
 
-            for (int i = 0; i < romaniaSquad.Count; i++)
+            for (int i = 0; i < fighters.Count; i++)
             {
                 Console.Write(i + ". ");
-                romaniaSquad[i].ShowInfoFighter();
-            }
-        }
-
-        private void ShowListHungarySquad(List<Hungary> hungarySquad)
-        {
-            Console.WriteLine($"Список бойцов страны {nameof(Hungary)}:");
-
-            for (int i = 0; i < hungarySquad.Count; i++)
-            {
-                Console.Write(i + ". ");
-                hungarySquad[i].ShowInfoFighter();
+                fighters[i].ShowInfoFighter();
             }
         }
     }
 
-    class Country
+    abstract class Squad
     {
-        protected string Name;
-        protected int Health;
-        protected int Damage;
-
-        public Country(string nameCombatant, int healthCombatant, int damageCombatant)
+        public Squad(string nameCombatant, int healthCombatant, int damageCombatant)
         {
             Name = nameCombatant;
             Health = healthCombatant;
             Damage = damageCombatant;
         }
 
-        public string NameState
-        {
-            get
-            {
-                return Name;
-            }
-        }
+        public int Health { get; protected set; }
 
-        public int DamageState
-        {
-            get
-            {
-                return Damage;
-            }
-        }
+        public int Damage { get; protected set; }
 
-        public int HealthState
-        {
-            get
-            {
-                return Health;
-            }
-        }
+        public string Name { get; protected set; }
 
         public virtual void ShowInfoFighter()
         {
@@ -234,52 +194,16 @@ namespace OOP10
         {
             Health -= damage;
         }
+
+        public abstract void Attack(Squad squad);
     }
 
-    abstract class Romania : Country
+    abstract class Fighter : Squad
     {
-        public Romania(string nameCombatant, int healthCombatant, int damageCombatant) : base(nameCombatant, healthCombatant, damageCombatant) { }
-
-        public abstract void Attack(Hungary hungary);
+        public Fighter(string nameCombatant, int healthCombatant, int damageCombatant) : base(nameCombatant, healthCombatant, damageCombatant) { }
     }
 
-    abstract class Hungary : Country
-    {
-        public Hungary(string nameCombatant, int healthCombatant, int damageCombatant) : base(nameCombatant, healthCombatant, damageCombatant) { }
-
-        public abstract void Attack(Romania romania);
-    }
-
-    class Boxer : Hungary
-    {
-        public Boxer(string nameCombatant, int healthCombatant, int damageCombatant) : base(nameCombatant, healthCombatant, damageCombatant) { }
-
-        public override void Attack(Romania romania)
-        {
-            romania.TakeDamage(Damage);
-
-            RestoreHealth(romania);
-        }
-
-        private void RestoreHealth(Romania romania)
-        {
-            Random random = new Random();
-
-            int halfRegenerationHealth = 2;
-            int activatingRegenerationHealth = 40;
-            int minimumActivatingRegenerationHealth = 1;
-            int maximumActivatingRegenerationHealth = 100;
-
-            if (activatingRegenerationHealth > random.Next(minimumActivatingRegenerationHealth, maximumActivatingRegenerationHealth))
-            {
-                int regenerationHealth = romania.DamageState / halfRegenerationHealth;
-                Console.WriteLine(Name + " получает - " + romania.DamageState + " урона и восстанавливает " + regenerationHealth + " здоровья.");
-                Health += regenerationHealth;
-            }
-        }
-    }
-
-    class Wrestler : Hungary
+    class Wrestler : Fighter
     {
         private int _samboWarriorEndurance = 100;
         private int _usingSkillDoubleAttack = 25;
@@ -295,14 +219,14 @@ namespace OOP10
             Console.WriteLine("Выносливость - " + _samboWarriorEndurance);
         }
 
-        public override void Attack(Romania romania)
+        public override void Attack(Squad romania)
         {
             romania.TakeDamage(Damage);
 
             UseDoubleAttack(romania);
         }
 
-        private void UseDoubleAttack(Romania romania)
+        private void UseDoubleAttack(Squad romania)
         {
             Random random = new Random();
 
@@ -340,21 +264,50 @@ namespace OOP10
         }
     }
 
-    class Kickboxer : Hungary
+    class Boxer : Fighter
+    {
+        public Boxer(string nameCombatant, int healthCombatant, int damageCombatant) : base(nameCombatant, healthCombatant, damageCombatant) { }
+
+        public override void Attack(Squad romania)
+        {
+            romania.TakeDamage(Damage);
+
+            RestoreHealth(romania);
+        }
+
+        private void RestoreHealth(Squad romania)
+        {
+            Random random = new Random();
+
+            int halfRegenerationHealth = 2;
+            int activatingRegenerationHealth = 40;
+            int minimumActivatingRegenerationHealth = 1;
+            int maximumActivatingRegenerationHealth = 100;
+
+            if (activatingRegenerationHealth > random.Next(minimumActivatingRegenerationHealth, maximumActivatingRegenerationHealth))
+            {
+                int regenerationHealth = romania.Damage / halfRegenerationHealth;
+                Console.WriteLine(Name + " получает - " + romania.Damage + " урона и восстанавливает " + regenerationHealth + " здоровья.");
+                Health += regenerationHealth;
+            }
+        }
+    }
+
+    class Kickboxer : Fighter
     {
         private int _beginningDoubleDamageCountdown = 0;
         private int _endDoubleDamageCountdown = 3;
 
         public Kickboxer(string nameCombatant, int healthCombatant, int damageCombatant) : base(nameCombatant, healthCombatant, damageCombatant) { }
 
-        public override void Attack(Romania romania)
+        public override void Attack(Squad romania)
         {
             romania.TakeDamage(Damage);
 
             UseDoubleDamage(romania);
         }
 
-        private void UseDoubleDamage(Romania romania)
+        private void UseDoubleDamage(Squad romania)
         {
             if (_endDoubleDamageCountdown <= _beginningDoubleDamageCountdown)
             {
@@ -374,18 +327,46 @@ namespace OOP10
         }
     }
 
-    class SumoWrestler : Hungary
+    class Karateka : Fighter
+    {
+        public Karateka(string nameCombatant, int healthCombatant, int damageCombatant) : base(nameCombatant, healthCombatant, damageCombatant) { }
+
+        public override void Attack(Squad hungary)
+        {
+            hungary.TakeDamage(Damage);
+
+            UseBleedingDamage(hungary);
+        }
+
+        private void UseBleedingDamage(Squad hungary)
+        {
+            Random random = new Random();
+
+            int activationBleedingDamage = 40;
+            int minimumBleedingDamage = 1;
+            int maximumBleedingDamage = 100;
+            int bleedingDamage = random.Next(10, 30);
+
+            if (activationBleedingDamage > random.Next(minimumBleedingDamage, maximumBleedingDamage))
+            {
+                Console.WriteLine(Name + ", выполняет режущий удар с логтя, у противника кровотечение на - " + bleedingDamage + " урона.");
+                hungary.TakeDamage(bleedingDamage);
+            }
+        }
+    }
+
+    class SumoWrestler : Fighter
     {
         public SumoWrestler(string nameCombatant, int healthCombatant, int damageCombatant) : base(nameCombatant, healthCombatant, damageCombatant) { }
 
-        public override void Attack(Romania romania)
+        public override void Attack(Squad romania)
         {
             romania.TakeDamage(Damage);
 
             UseDoublingDamage(romania);
         }
 
-        private void UseDoublingDamage(Romania romania)
+        private void UseDoublingDamage(Squad romania)
         {
             Random random = new Random();
 
@@ -404,39 +385,11 @@ namespace OOP10
         }
     }
 
-    class Karateka : Romania
-    {
-        public Karateka(string nameCombatant, int healthCombatant, int damageCombatant) : base(nameCombatant, healthCombatant, damageCombatant) { }
-
-        public override void Attack(Hungary hungary)
-        {
-            hungary.TakeDamage(Damage);
-
-            UseBleedingDamage(hungary);
-        }
-
-        private void UseBleedingDamage(Hungary hungary)
-        {
-            Random random = new Random();
-
-            int activationBleedingDamage = 40;
-            int minimumBleedingDamage = 1;
-            int maximumBleedingDamage = 100;
-            int bleedingDamage = random.Next(10, 30);
-
-            if (activationBleedingDamage > random.Next(minimumBleedingDamage, maximumBleedingDamage))
-            {
-                Console.WriteLine(Name + ", выполняет режущий удар с логтя, у противника кровотечение на - " + bleedingDamage + " урона.");
-                hungary.TakeDamage(bleedingDamage);
-            }
-        }
-    }
-
-    class TaekwondoPractitioner : Romania
+    class TaekwondoPractitioner : Fighter
     {
         public TaekwondoPractitioner(string nameCombatant, int healthCombatant, int damageCombatant) : base(nameCombatant, healthCombatant, damageCombatant) { }
 
-        public override void Attack(Hungary hungary)
+        public override void Attack(Squad hungary)
         {
             hungary.TakeDamage(Damage);
 
@@ -473,7 +426,7 @@ namespace OOP10
             }
         }
 
-        private void UseReflectionDamage(Hungary hungary)
+        private void UseReflectionDamage(Squad hungary)
         {
             Random random = new Random();
 
@@ -483,8 +436,8 @@ namespace OOP10
 
             if (activationReflectionDamage > random.Next(minimumValueReflectionDamage, maximumValueReflectionDamage))
             {
-                Console.WriteLine(Name + " отражает атаку противника на " + hungary.DamageState + " урона.");
-                hungary.TakeDamage(hungary.DamageState);
+                Console.WriteLine(Name + " отражает атаку противника на " + hungary.Damage + " урона.");
+                hungary.TakeDamage(hungary.Damage);
             }
         }
 
@@ -496,16 +449,16 @@ namespace OOP10
         }
     }
 
-    class Сapoeirista : Romania
+    class Сapoeirista : Fighter
     {
         public Сapoeirista(string nameCombatant, int healthCombatant, int damageCombatant) : base(nameCombatant, healthCombatant, damageCombatant) { }
 
-        public override void Attack(Hungary hungary)
+        public override void Attack(Squad hungary)
         {
             UseCriticalDamage(hungary);
         }
 
-        private void UseCriticalDamage(Hungary hungary)
+        private void UseCriticalDamage(Squad hungary)
         {
             Random random = new Random();
 
@@ -529,18 +482,18 @@ namespace OOP10
         }
     }
 
-    class Aikidoka : Romania
+    class Aikidoka : Fighter
     {
         public Aikidoka(string nameCombatant, int healthCombatant, int damageCombatant) : base(nameCombatant, healthCombatant, damageCombatant) { }
 
-        public override void Attack(Hungary hungary)
+        public override void Attack(Squad hungary)
         {
             hungary.TakeDamage(Damage);
 
             UseReverseDamage(hungary);
         }
 
-        private void UseReverseDamage(Hungary hungary)
+        private void UseReverseDamage(Squad hungary)
         {
             Random random = new Random();
 
