@@ -7,7 +7,7 @@ namespace OOP10
             const string CommandСhooseFighters = "1";
             const string CommandExit = "2";
 
-            War arena = new War();
+            Arena arena = new Arena();
 
             bool isWorking = true;
 
@@ -20,7 +20,7 @@ namespace OOP10
 
                 if (CommandСhooseFighters == userInput)
                 {
-                    arena.FightingTakingPlace();
+                    arena.StartFight();
                 }
                 else if (userInput == CommandExit)
                 {
@@ -34,11 +34,11 @@ namespace OOP10
         }
     }
 
-    class War
+    class Arena
     {
         private Random _random = new Random();
 
-        public void FightingTakingPlace()
+        public void StartFight()
         {
             List<Squad> hungarySquad = new List<Squad>
             {
