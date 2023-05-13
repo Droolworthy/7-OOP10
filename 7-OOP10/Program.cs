@@ -20,7 +20,7 @@ namespace OOP10
 
                 if (CommandСhooseFighters == userInput)
                 {
-                    arena.StartFight();
+                    arena.Fight();
                 }
                 else if (userInput == CommandExit)
                 {
@@ -37,10 +37,142 @@ namespace OOP10
     class Arena
     {
         private Random _random = new Random();
-
-        public void StartFight()
+        private Squad _creator = new Squad();
+        private List<Fighter> _firstSquad;
+        private List<Fighter> _secondSquad;
+        
+        public Arena()
         {
-            List<Squad> hungarySquad = new List<Squad>
+            _firstSquad = _creator.CreateFirstSquad();
+            _secondSquad = _creator.CreateSecondSquad();
+        }
+
+        public void Fight()
+        {
+            while (_firstSquad.Count > 0 && _secondSquad.Count > 0)
+            {
+                ShowListSquad(_firstSquad);
+
+                int numberFirstSquad = _random.Next(_firstSquad.Count);
+                Fighter firstCombatantSquad = _firstSquad[numberFirstSquad];
+
+                ChooseFighters(_firstSquad, firstCombatantSquad);
+
+                ShowListSquad(_secondSquad);
+
+                int numberSecondSquad = _random.Next(_secondSquad.Count);
+                Fighter secondCombatantSquad = _secondSquad[numberSecondSquad];
+
+                ChooseFighters(_secondSquad, secondCombatantSquad);
+
+                FightSquads(_firstSquad, _secondSquad, secondCombatantSquad, firstCombatantSquad);
+
+                ShowWinningCountry(_firstSquad, _secondSquad);
+            }
+        }
+
+        private void ChooseFighters(List<Fighter> countrySquad, Fighter nameFighter)
+        {
+            Console.WriteLine("\nВы выбрали бойца - " + nameFighter.Name);
+            Console.WriteLine("Для продолжения нажмите любую клавишу...");
+            Console.ReadKey();
+        }
+
+        private void FightSquads(List<Fighter> firstCombatantSquad, List<Fighter> secondCombatantSquad, Fighter secondSquad, Fighter firstSquad)
+        {
+            Console.WriteLine("\nВОЙНА НАЧИНАЕТСЯ!");
+            Console.WriteLine();
+
+            while (firstSquad.Health > 0 && secondSquad.Health > 0)
+            {
+                firstSquad.Attack(secondSquad);
+                secondSquad.Attack(firstSquad);
+                firstSquad.ShowInfoSoldier();
+                secondSquad.ShowInfoSoldier();
+
+                Console.WriteLine("---------------------------------------------------");
+
+                ShowWinningSquad(firstCombatantSquad, secondCombatantSquad, secondSquad, firstSquad);
+            }
+        }
+
+        private void ShowWinningSquad(List<Fighter> firstCombatantSquad, List<Fighter> secondCombatantSquad, Fighter secondSquad, Fighter firstSquad)
+        {
+            if (firstSquad.Health <= 0)
+            {
+                if (secondSquad.Health <= 0)
+                {
+                    RemoveCombatantSquad(firstCombatantSquad, secondCombatantSquad, secondSquad, firstSquad);
+                }
+                else
+                {
+                    firstCombatantSquad.Remove(firstSquad);
+
+                    Console.WriteLine("\nПобеда бойца - " + secondSquad.Name);
+                }
+            }
+            else if (secondSquad.Health <= 0)
+            {
+                if (firstSquad.Health <= 0)
+                {
+                    RemoveCombatantSquad(firstCombatantSquad, secondCombatantSquad, secondSquad, firstSquad);
+                }
+                else
+                {
+                    secondCombatantSquad.Remove(secondSquad);
+
+                    Console.WriteLine("\nПобеда бойца - " + firstSquad.Name);
+                }
+            }
+        }
+
+        private void RemoveCombatantSquad(List<Fighter> firstCombatantSquad, List<Fighter> secondCombatantSquad, Fighter secondSquad, Fighter firstSquad)
+        {
+            firstCombatantSquad.Remove(firstSquad);
+            secondCombatantSquad.Remove(secondSquad);
+
+            Console.WriteLine("\nОба бойца погибли на поле боя.");
+        }
+
+        private void ShowWinningCountry(List<Fighter> firstSquad, List<Fighter> secondSquad)
+        {
+            string firstCountry = "Венгрия";
+            string secondCountry = "Румыния";
+            
+            if (firstSquad.Count <= 0 & secondSquad.Count <= 0)
+            {
+                Console.WriteLine("\nНичья. Победила дружба.");
+                return;
+            }
+            else if (firstSquad.Count <= 0)
+            {
+                Console.WriteLine($"\nСтрана {firstCountry} побеждает!");
+                return;
+            }
+            else if (secondSquad.Count <= 0)
+            {
+                Console.WriteLine($"\nСтрана {secondCountry} побеждает!");
+                return;
+            }
+        }
+
+        private void ShowListSquad(List<Fighter> fighters)
+        {
+            Console.WriteLine($"\nСписок бойцов:");
+
+            for (int i = 0; i < _firstSquad.Count; i++)
+            {
+                Console.Write(i + ". ");
+                _firstSquad[i].ShowInfoSoldier();
+            }
+        }
+    }
+
+    class Squad
+    {
+        public List<Fighter> CreateFirstSquad()
+        {
+            List<Fighter> firstSquad = new List<Fighter>
             {
                 new Wrestler(nameof(Wrestler), 450, 20, 100),
                 new Kickboxer(nameof(Kickboxer), 500, 15),
@@ -48,7 +180,12 @@ namespace OOP10
                 new SumoWrestler(nameof(SumoWrestler), 330, 15),
             };
 
-            List<Squad> romaniaSquad = new List<Squad>
+            return firstSquad;
+        }
+
+        public List<Fighter> CreateSecondSquad()
+        {
+            List<Fighter> secondSquad = new List<Fighter>
             {
                 new Karateka(nameof(Karateka), 500, 22),
                 new TaekwondoPractitioner(nameof(TaekwondoPractitioner), 330, 30),
@@ -56,123 +193,13 @@ namespace OOP10
                 new Aikidoka(nameof(Aikidoka), 340, 25),
             };
 
-            while (hungarySquad.Count > 0 && romaniaSquad.Count > 0)
-            {
-                ShowListSquad(hungarySquad);
-
-                int numberHungarySquad = _random.Next(hungarySquad.Count);
-                Squad hungary = hungarySquad[numberHungarySquad];
-
-                ChooseFighters(hungarySquad, hungary);
-
-                ShowListSquad(hungarySquad);
-
-                int numberRomaniaSquad = _random.Next(romaniaSquad.Count);
-                Squad romania = romaniaSquad[numberRomaniaSquad];
-
-                ChooseFighters(romaniaSquad, romania);
-
-                FightSquads(hungarySquad, romaniaSquad, romania, hungary);
-
-                ShowWinningCountry(hungarySquad, romaniaSquad);
-            }
-        }
-
-        private void ChooseFighters(List<Squad> countrySquad, Squad nameFighter)
-        {
-            Console.WriteLine("\nВы выбрали бойца - " + nameFighter.Name);
-            Console.WriteLine("Для продолжения нажмите любую клавишу...");
-            Console.ReadKey();
-        }
-
-        private void FightSquads(List<Squad> hungarySquad, List<Squad> romaniaSquad, Squad romania, Squad hungary)
-        {
-            Console.WriteLine("\nВОЙНА НАЧИНАЕТСЯ!");
-            Console.WriteLine();
-
-            while (hungary.Health > 0 && romania.Health > 0)
-            {
-                hungary.Attack(romania);
-                romania.Attack(hungary);
-                hungary.ShowInfoFighter();
-                romania.ShowInfoFighter();
-
-                Console.WriteLine("---------------------------------------------------");
-
-                ShowWinningSquad(hungarySquad, romaniaSquad, romania, hungary);
-            }
-        }
-
-        private void ShowWinningSquad(List<Squad> hungarySquad, List<Squad> romaniaSquad, Squad romania, Squad hungary)
-        {
-            if (hungary.Health <= 0)
-            {
-                if (romania.Health <= 0)
-                {
-                    hungarySquad.Remove(hungary);
-                    romaniaSquad.Remove(romania);
-
-                    Console.WriteLine("\nОба бойца погибли на поле боя.");
-                }
-                else
-                {
-                    hungarySquad.Remove(hungary);
-
-                    Console.WriteLine("\nПобеда бойца - " + romania.Name);
-                }
-            }
-            else if (romania.Health <= 0)
-            {
-                if (hungary.Health <= 0)
-                {
-                    hungarySquad.Remove(hungary);
-                    romaniaSquad.Remove(romania);
-
-                    Console.WriteLine("\nОба бойца погибли на поле боя.");
-                }
-                else
-                {
-                    romaniaSquad.Remove(romania);
-
-                    Console.WriteLine("\nПобеда бойца - " + hungary.Name);
-                }
-            }
-        }
-
-        private void ShowWinningCountry(List<Squad> hungarySquad, List<Squad> romaniaSquad)
-        {
-            if (hungarySquad.Count <= 0 & romaniaSquad.Count <= 0)
-            {
-                Console.WriteLine("\nНичья. Победила дружба.");
-                return;
-            }
-            else if (hungarySquad.Count <= 0)
-            {
-                Console.WriteLine("\nСтрана Румыния побеждает!");
-                return;
-            }
-            else if (romaniaSquad.Count <= 0)
-            {
-                Console.WriteLine("\nСтрана Венгрия побеждает!");
-                return;
-            }
-        }
-
-        private void ShowListSquad(List<Squad> fighters)
-        {
-            Console.WriteLine($"\nСписок бойцов:");
-
-            for (int i = 0; i < fighters.Count; i++)
-            {
-                Console.Write(i + ". ");
-                fighters[i].ShowInfoFighter();
-            }
+            return secondSquad;
         }
     }
 
-    abstract class Squad
+    abstract class Fighter
     {
-        public Squad(string nameCombatant, int healthCombatant, int damageCombatant)
+        public Fighter(string nameCombatant, int healthCombatant, int damageCombatant)
         {
             Name = nameCombatant;
             Health = healthCombatant;
@@ -185,22 +212,20 @@ namespace OOP10
 
         public string Name { get; protected set; }
 
-        public virtual void ShowInfoFighter()
+        public virtual void ShowInfoSoldier()
         {
             Console.WriteLine("Name - " + Name + ", Health - " + Health + " хп; " + "Damage - " + Damage + ";");
         }
 
         public virtual void TakeDamage(int damage)
         {
-            Health -= damage;
+            if (damage > 0)
+            {
+                Health -= damage;
+            }
         }
 
-        public abstract void Attack(Squad squad);
-    }
-
-    abstract class Fighter : Squad
-    {
-        public Fighter(string nameCombatant, int healthCombatant, int damageCombatant) : base(nameCombatant, healthCombatant, damageCombatant) { }
+        public abstract void Attack(Fighter enemy);
     }
 
     class Wrestler : Fighter
@@ -213,20 +238,20 @@ namespace OOP10
             _samboWarriorEndurance = samboCombatantEndurance;
         }
 
-        public override void ShowInfoFighter()
+        public override void ShowInfoSoldier()
         {
-            base.ShowInfoFighter();
+            base.ShowInfoSoldier();
             Console.WriteLine("Выносливость - " + _samboWarriorEndurance);
         }
 
-        public override void Attack(Squad romania)
+        public override void Attack(Fighter enemy)
         {
-            romania.TakeDamage(Damage);
+            enemy.TakeDamage(Damage);
 
-            UseDoubleAttack(romania);
+            UseDoubleAttack(enemy);
         }
 
-        private void UseDoubleAttack(Squad romania)
+        private void UseDoubleAttack(Fighter enemy)
         {
             Random random = new Random();
 
@@ -240,7 +265,7 @@ namespace OOP10
 
                 if (TryDoubleAttack())
                 {
-                    romania.TakeDamage(Damage);
+                    enemy.TakeDamage(Damage);
                 }
                 else
                 {
@@ -268,14 +293,14 @@ namespace OOP10
     {
         public Boxer(string nameCombatant, int healthCombatant, int damageCombatant) : base(nameCombatant, healthCombatant, damageCombatant) { }
 
-        public override void Attack(Squad romania)
+        public override void Attack(Fighter enemy)
         {
-            romania.TakeDamage(Damage);
+            enemy.TakeDamage(Damage);
 
-            RestoreHealth(romania);
+            RestoreHealth(enemy);
         }
 
-        private void RestoreHealth(Squad romania)
+        private void RestoreHealth(Fighter enemy)
         {
             Random random = new Random();
 
@@ -286,8 +311,8 @@ namespace OOP10
 
             if (activatingRegenerationHealth > random.Next(minimumActivatingRegenerationHealth, maximumActivatingRegenerationHealth))
             {
-                int regenerationHealth = romania.Damage / halfRegenerationHealth;
-                Console.WriteLine(Name + " получает - " + romania.Damage + " урона и восстанавливает " + regenerationHealth + " здоровья.");
+                int regenerationHealth = enemy.Damage / halfRegenerationHealth;
+                Console.WriteLine(Name + " получает - " + enemy.Damage + " урона и восстанавливает " + regenerationHealth + " здоровья.");
                 Health += regenerationHealth;
             }
         }
@@ -300,14 +325,14 @@ namespace OOP10
 
         public Kickboxer(string nameCombatant, int healthCombatant, int damageCombatant) : base(nameCombatant, healthCombatant, damageCombatant) { }
 
-        public override void Attack(Squad romania)
+        public override void Attack(Fighter enemy)
         {
-            romania.TakeDamage(Damage);
+            enemy.TakeDamage(Damage);
 
-            UseDoubleDamage(romania);
+            UseDoubleDamage(enemy);
         }
 
-        private void UseDoubleDamage(Squad romania)
+        private void UseDoubleDamage(Fighter enemy)
         {
             if (_endDoubleDamageCountdown <= _beginningDoubleDamageCountdown)
             {
@@ -318,7 +343,7 @@ namespace OOP10
                     _endDoubleDamageCountdown += _endDoubleDamageCountdown;
                 }
 
-                romania.TakeDamage(Damage);
+                enemy.TakeDamage(Damage);
             }
             else
             {
@@ -331,14 +356,14 @@ namespace OOP10
     {
         public Karateka(string nameCombatant, int healthCombatant, int damageCombatant) : base(nameCombatant, healthCombatant, damageCombatant) { }
 
-        public override void Attack(Squad hungary)
+        public override void Attack(Fighter enemy)
         {
-            hungary.TakeDamage(Damage);
+            enemy.TakeDamage(Damage);
 
-            UseBleedingDamage(hungary);
+            UseBleedingDamage(enemy);
         }
 
-        private void UseBleedingDamage(Squad hungary)
+        private void UseBleedingDamage(Fighter enemy)
         {
             Random random = new Random();
 
@@ -350,7 +375,7 @@ namespace OOP10
             if (activationBleedingDamage > random.Next(minimumBleedingDamage, maximumBleedingDamage))
             {
                 Console.WriteLine(Name + ", выполняет режущий удар с логтя, у противника кровотечение на - " + bleedingDamage + " урона.");
-                hungary.TakeDamage(bleedingDamage);
+                enemy.TakeDamage(bleedingDamage);
             }
         }
     }
@@ -359,14 +384,14 @@ namespace OOP10
     {
         public SumoWrestler(string nameCombatant, int healthCombatant, int damageCombatant) : base(nameCombatant, healthCombatant, damageCombatant) { }
 
-        public override void Attack(Squad romania)
+        public override void Attack(Fighter enemy)
         {
-            romania.TakeDamage(Damage);
+            enemy.TakeDamage(Damage);
 
-            UseDoublingDamage(romania);
+            UseDoublingDamage(enemy);
         }
 
-        private void UseDoublingDamage(Squad romania)
+        private void UseDoublingDamage(Fighter enemy)
         {
             Random random = new Random();
 
@@ -380,7 +405,7 @@ namespace OOP10
 
                 Damage += Damage;
 
-                romania.TakeDamage(Damage);
+                enemy.TakeDamage(Damage);
             }
         }
     }
@@ -389,11 +414,11 @@ namespace OOP10
     {
         public TaekwondoPractitioner(string nameCombatant, int healthCombatant, int damageCombatant) : base(nameCombatant, healthCombatant, damageCombatant) { }
 
-        public override void Attack(Squad hungary)
+        public override void Attack(Fighter enemy)
         {
-            hungary.TakeDamage(Damage);
+            enemy.TakeDamage(Damage);
 
-            UseReflectionDamage(hungary);
+            UseReflectionDamage(enemy);
         }
 
         public override void TakeDamage(int damage)
@@ -416,17 +441,10 @@ namespace OOP10
             int minimumValueReflectionDamage = 1;
             int maximumValueReflectionDamage = 100;
 
-            if (activationReflectionDamage > random.Next(minimumValueReflectionDamage, maximumValueReflectionDamage))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return (activationReflectionDamage > random.Next(minimumValueReflectionDamage, maximumValueReflectionDamage));
         }
 
-        private void UseReflectionDamage(Squad hungary)
+        private void UseReflectionDamage(Fighter enemy)
         {
             Random random = new Random();
 
@@ -436,8 +454,8 @@ namespace OOP10
 
             if (activationReflectionDamage > random.Next(minimumValueReflectionDamage, maximumValueReflectionDamage))
             {
-                Console.WriteLine(Name + " отражает атаку противника на " + hungary.Damage + " урона.");
-                hungary.TakeDamage(hungary.Damage);
+                Console.WriteLine(Name + " отражает атаку противника на " + enemy.Damage + " урона.");
+                enemy.TakeDamage(enemy.Damage);
             }
         }
 
@@ -453,12 +471,12 @@ namespace OOP10
     {
         public Сapoeirista(string nameCombatant, int healthCombatant, int damageCombatant) : base(nameCombatant, healthCombatant, damageCombatant) { }
 
-        public override void Attack(Squad hungary)
+        public override void Attack(Fighter enemy)
         {
-            UseCriticalDamage(hungary);
+            UseCriticalDamage(enemy);
         }
 
-        private void UseCriticalDamage(Squad hungary)
+        private void UseCriticalDamage(Fighter enemy)
         {
             Random random = new Random();
 
@@ -473,11 +491,11 @@ namespace OOP10
 
                 Console.WriteLine($"У {Name} критический урон. Он наносит по противнику {criticalDamage} урона.");
 
-                hungary.TakeDamage(damage);
+                enemy.TakeDamage(damage);
             }
             else
             {
-                hungary.TakeDamage(Damage);
+                enemy.TakeDamage(Damage);
             }
         }
     }
@@ -486,14 +504,14 @@ namespace OOP10
     {
         public Aikidoka(string nameCombatant, int healthCombatant, int damageCombatant) : base(nameCombatant, healthCombatant, damageCombatant) { }
 
-        public override void Attack(Squad hungary)
+        public override void Attack(Fighter enemy)
         {
-            hungary.TakeDamage(Damage);
+            enemy.TakeDamage(Damage);
 
-            UseReverseDamage(hungary);
+            UseReverseDamage(enemy);
         }
 
-        private void UseReverseDamage(Squad hungary)
+        private void UseReverseDamage(Fighter enemy)
         {
             Random random = new Random();
 
@@ -506,7 +524,7 @@ namespace OOP10
             {
                 int reverseDamage = damage * Damage;
 
-                hungary.TakeDamage(reverseDamage);
+                enemy.TakeDamage(reverseDamage);
 
                 TakeDamage(reverseDamage);
 
