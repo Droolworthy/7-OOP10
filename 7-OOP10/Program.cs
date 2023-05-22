@@ -36,15 +36,15 @@ namespace OOP10
 
     class Arena
     {
+        private Squad _firstSquad;
+        private Squad _secondSquad;
+        private SquadCreator _creator = new SquadCreator();
         private Random _random = new Random();
-        private Squad _creator = new Squad();
-        private List<Fighter> _firstSquad;
-        private List<Fighter> _secondSquad;
-        
+
         public Arena()
         {
-            _firstSquad = _creator.CreateFirstSquad();
-            _secondSquad = _creator.CreateSecondSquad();
+            _firstSquad = _creator.CreateFirstSquad("Венгрия");
+            _secondSquad = _creator.CreateSecondSquad("Румыния");
         }
 
         public void Fight()
@@ -53,157 +53,193 @@ namespace OOP10
             {
                 ShowListSquad(_firstSquad);
 
-                int numberFirstSquad = _random.Next(_firstSquad.Count);
-                Fighter firstCombatantSquad = _firstSquad[numberFirstSquad];
-
-                ChooseFighters(_firstSquad, firstCombatantSquad);
+                Fighter firstFighter = _firstSquad.GetFighterPlatoon(_random.Next(_secondSquad.Count));
+                Console.WriteLine($"Вы выбрали бойца - {firstFighter.Name}");
 
                 ShowListSquad(_secondSquad);
 
-                int numberSecondSquad = _random.Next(_secondSquad.Count);
-                Fighter secondCombatantSquad = _secondSquad[numberSecondSquad];
+                Fighter secondFighter = _secondSquad.GetFighterPlatoon(_random.Next(_secondSquad.Count));
+                Console.WriteLine($"Вы выбрали бойца - {secondFighter.Name}");
 
-                ChooseFighters(_secondSquad, secondCombatantSquad);
+                FightSquads(firstFighter, secondFighter);
 
-                FightSquads(_firstSquad, _secondSquad, secondCombatantSquad, firstCombatantSquad);
-
-                ShowWinningCountry(_firstSquad, _secondSquad);
+                ShowWinningCountry();
             }
         }
 
-        private void ChooseFighters(List<Fighter> countrySquad, Fighter nameFighter)
-        {
-            Console.WriteLine("\nВы выбрали бойца - " + nameFighter.Name);
-            Console.WriteLine("Для продолжения нажмите любую клавишу...");
-            Console.ReadKey();
-        }
-
-        private void FightSquads(List<Fighter> firstCombatantSquad, List<Fighter> secondCombatantSquad, Fighter secondSquad, Fighter firstSquad)
+        private void FightSquads(Fighter firstFighter, Fighter secondFighter)
         {
             Console.WriteLine("\nВОЙНА НАЧИНАЕТСЯ!");
             Console.WriteLine();
 
-            while (firstSquad.Health > 0 && secondSquad.Health > 0)
+            while (firstFighter.Health > 0 && secondFighter.Health > 0)
             {
-                firstSquad.Attack(secondSquad);
-                secondSquad.Attack(firstSquad);
-                firstSquad.ShowInfoSoldier();
-                secondSquad.ShowInfoSoldier();
+                firstFighter.Attack(secondFighter);
+                secondFighter.Attack(firstFighter);
+                firstFighter.ShowInfoSoldier();
+                secondFighter.ShowInfoSoldier();
 
                 Console.WriteLine("---------------------------------------------------");
+                Console.ReadKey();
 
-                ShowWinningSquad(firstCombatantSquad, secondCombatantSquad, secondSquad, firstSquad);
+                ShowWinningSquad(firstFighter, secondFighter);
             }
         }
 
-        private void ShowWinningSquad(List<Fighter> firstCombatantSquad, List<Fighter> secondCombatantSquad, Fighter secondSquad, Fighter firstSquad)
+        private void ShowWinningSquad(Fighter firstFighter, Fighter secondFighter)
         {
-            if (firstSquad.Health <= 0)
+            if (firstFighter.Health <= 0)
             {
-                if (secondSquad.Health <= 0)
+                if (secondFighter.Health <= 0)
                 {
-                    RemoveCombatantSquad(firstCombatantSquad, secondCombatantSquad, secondSquad, firstSquad);
+                    RemoveCombatantSquad(firstFighter, secondFighter);
                 }
                 else
                 {
-                    firstCombatantSquad.Remove(firstSquad);
+                    _firstSquad.RemoveFighterPlatoon(firstFighter);
 
-                    Console.WriteLine("\nПобеда бойца - " + secondSquad.Name);
+                    Console.WriteLine("\nПобеда бойца - " + secondFighter.Name);
+                    Console.ReadKey();
                 }
             }
-            else if (secondSquad.Health <= 0)
+            else if (secondFighter.Health <= 0)
             {
-                if (firstSquad.Health <= 0)
+                if (firstFighter.Health <= 0)
                 {
-                    RemoveCombatantSquad(firstCombatantSquad, secondCombatantSquad, secondSquad, firstSquad);
+                    RemoveCombatantSquad(firstFighter, secondFighter);
                 }
                 else
                 {
-                    secondCombatantSquad.Remove(secondSquad);
+                    _secondSquad.RemoveFighterPlatoon(secondFighter);
 
-                    Console.WriteLine("\nПобеда бойца - " + firstSquad.Name);
+                    Console.WriteLine("\nПобеда бойца - " + firstFighter.Name);
+                    Console.ReadKey();
                 }
             }
         }
 
-        private void RemoveCombatantSquad(List<Fighter> firstCombatantSquad, List<Fighter> secondCombatantSquad, Fighter secondSquad, Fighter firstSquad)
+        private void RemoveCombatantSquad(Fighter firstFighter, Fighter secondFighter)
         {
-            firstCombatantSquad.Remove(firstSquad);
-            secondCombatantSquad.Remove(secondSquad);
+            _firstSquad.RemoveFighterPlatoon(firstFighter);
+            _secondSquad.RemoveFighterPlatoon(secondFighter);
 
             Console.WriteLine("\nОба бойца погибли на поле боя.");
         }
 
-        private void ShowWinningCountry(List<Fighter> firstSquad, List<Fighter> secondSquad)
+        private void ShowWinningCountry()
         {
-            string firstCountry = "Венгрия";
-            string secondCountry = "Румыния";
-            
-            if (firstSquad.Count <= 0 & secondSquad.Count <= 0)
+            if (_firstSquad.Count <= 0 & _secondSquad.Count <= 0)
             {
                 Console.WriteLine("\nНичья. Победила дружба.");
                 return;
             }
-            else if (firstSquad.Count <= 0)
+            else if (_firstSquad.Count <= 0)
             {
-                Console.WriteLine($"\nСтрана {firstCountry} побеждает!");
+                Console.WriteLine($"\nСтрана {_firstSquad.Country} побеждает!");
                 return;
             }
-            else if (secondSquad.Count <= 0)
+            else if (_secondSquad.Count <= 0)
             {
-                Console.WriteLine($"\nСтрана {secondCountry} побеждает!");
+                Console.WriteLine($"\nСтрана {_secondSquad.Country} побеждает!");
                 return;
             }
         }
 
-        private void ShowListSquad(List<Fighter> fighters)
+        private void ShowListSquad(Squad squad)
         {
-            Console.WriteLine($"\nСписок бойцов:");
+            Console.WriteLine($"\n{squad.Country}. Список бойцов:");
 
-            for (int i = 0; i < _firstSquad.Count; i++)
+            squad.ShowInfoFighters();
+        }
+    }
+
+    class SquadCreator
+    {
+        public Squad CreateFirstSquad(string country)
+        {
+            List<Fighter> firstSquad = new List<Fighter>
             {
-                Console.Write(i + ". ");
-                _firstSquad[i].ShowInfoSoldier();
-            }
+                new Wrestler(nameof(Wrestler), 80, 20, 100),
+                new Kickboxer(nameof(Kickboxer), 60, 15),
+                new Boxer(nameof(Boxer), 50, 20),
+                new SumoWrestler(nameof(SumoWrestler), 55, 15),
+            };
+
+            Squad squad = new Squad(firstSquad, country);
+
+            return squad;
+        }
+
+        public Squad CreateSecondSquad(string country)
+        {
+            List<Fighter> secondSquad = new List<Fighter>
+            {
+                new Karateka(nameof(Karateka), 50, 22),
+                new TaekwondoPractitioner(nameof(TaekwondoPractitioner), 33, 30),
+                new Сapoeirista(nameof(Сapoeirista), 100, 15),
+                new Aikidoka(nameof(Aikidoka), 66, 25),
+            };
+
+            Squad squad = new Squad(secondSquad, country);
+
+            return squad;
         }
     }
 
     class Squad
     {
-        public List<Fighter> CreateFirstSquad()
-        {
-            List<Fighter> firstSquad = new List<Fighter>
-            {
-                new Wrestler(nameof(Wrestler), 450, 20, 100),
-                new Kickboxer(nameof(Kickboxer), 500, 15),
-                new Boxer(nameof(Boxer), 375, 20),
-                new SumoWrestler(nameof(SumoWrestler), 330, 15),
-            };
+        private List<Fighter> _fighters = new List<Fighter>();
 
-            return firstSquad;
+        public Squad(List<Fighter> fighters, string country)
+        {
+            _fighters = fighters;
+            Country = country;
         }
 
-        public List<Fighter> CreateSecondSquad()
-        {
-            List<Fighter> secondSquad = new List<Fighter>
-            {
-                new Karateka(nameof(Karateka), 500, 22),
-                new TaekwondoPractitioner(nameof(TaekwondoPractitioner), 330, 30),
-                new Сapoeirista(nameof(Сapoeirista), 510, 15),
-                new Aikidoka(nameof(Aikidoka), 340, 25),
-            };
+        public string Country { get; private set; }
 
-            return secondSquad;
+        public int Count => _fighters.Count;
+
+        public Fighter GetFighterPlatoon(int index)
+        {
+            if (index >= 0 && index < _fighters.Count)
+            {
+                return _fighters[index];
+            }
+
+            return _fighters[_fighters.Count - 1];
+        }
+
+        public void ShowInfoFighters()
+        {
+            for (int i = 0; i < _fighters.Count; i++)
+            {
+                Console.Write(i + ". ");
+                _fighters[i].ShowInfoSoldier();
+            }
+        }
+
+        public void RemoveFighterPlatoon(Fighter fighter)
+        {
+            _fighters.Remove(fighter);
         }
     }
 
     abstract class Fighter
     {
+        private List<Fighter> _fighters;
+
         public Fighter(string nameCombatant, int healthCombatant, int damageCombatant)
         {
             Name = nameCombatant;
             Health = healthCombatant;
             Damage = damageCombatant;
+        }
+
+        public Fighter(List<Fighter> fighters, string name)
+        {
+            _fighters = fighters;
+            Name = name;
         }
 
         public int Health { get; protected set; }
