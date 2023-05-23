@@ -4,21 +4,21 @@ namespace OOP10
     {
         static void Main(string[] args)
         {
-            const string CommandСhooseFighters = "1";
+            const string CommandFightFighters = "1";
             const string CommandExit = "2";
 
             Arena arena = new Arena();
 
             bool isWorking = true;
 
-            Console.WriteLine($"{CommandСhooseFighters} - ВЫБРАТЬ БОЙЦОВ" + $"\n{CommandExit} - ВЫХОД");
+            Console.WriteLine($"{CommandFightFighters} - БИТВА БОЙЦОВ" + $"\n{CommandExit} - ВЫХОД");
 
             while (isWorking)
             {
                 Console.Write("\nВведите команду: ");
                 string userInput = Console.ReadLine();
 
-                if (CommandСhooseFighters == userInput)
+                if (CommandFightFighters == userInput)
                 {
                     arena.Fight();
                 }
@@ -28,9 +28,19 @@ namespace OOP10
                 }
                 else
                 {
-                    Console.WriteLine($"Ошибка. Введите {CommandСhooseFighters} или {CommandExit}");
+                    Console.WriteLine($"Ошибка. Введите {CommandFightFighters} или {CommandExit}");
                 }
             }
+        }
+    }
+
+    class UserUtils
+    {
+        private static Random _random = new Random();
+
+        public static int GenerateRandomNumber(int min, int max)
+        {
+            return _random.Next(min, max);
         }
     }
 
@@ -39,12 +49,11 @@ namespace OOP10
         private Squad _firstSquad;
         private Squad _secondSquad;
         private SquadCreator _creator = new SquadCreator();
-        private Random _random = new Random();
 
         public Arena()
         {
-            _firstSquad = _creator.CreateFirstSquad("Венгрия");
-            _secondSquad = _creator.CreateSecondSquad("Румыния");
+            _firstSquad = _creator.CreateFirstSquad();
+            _secondSquad = _creator.CreateSecondSquad();
         }
 
         public void Fight()
@@ -53,12 +62,12 @@ namespace OOP10
             {
                 ShowListSquad(_firstSquad);
 
-                Fighter firstFighter = _firstSquad.GetFighterPlatoon(_random.Next(_secondSquad.Count));
+                Fighter firstFighter = _firstSquad.GetFighter(UserUtils.GenerateRandomNumber(0, _firstSquad.Count));
                 Console.WriteLine($"Вы выбрали бойца - {firstFighter.Name}");
 
                 ShowListSquad(_secondSquad);
 
-                Fighter secondFighter = _secondSquad.GetFighterPlatoon(_random.Next(_secondSquad.Count));
+                Fighter secondFighter = _secondSquad.GetFighter(UserUtils.GenerateRandomNumber(0, _secondSquad.Count));
                 Console.WriteLine($"Вы выбрали бойца - {secondFighter.Name}");
 
                 FightSquads(firstFighter, secondFighter);
@@ -82,22 +91,22 @@ namespace OOP10
                 Console.WriteLine("---------------------------------------------------");
                 Console.ReadKey();
 
-                ShowWinningSquad(firstFighter, secondFighter);
+                ShowWinningFighter(firstFighter, secondFighter);
+
+                RemoveCombatantSquad(firstFighter, secondFighter);
             }
         }
 
-        private void ShowWinningSquad(Fighter firstFighter, Fighter secondFighter)
+        private void ShowWinningFighter(Fighter firstFighter, Fighter secondFighter)
         {
             if (firstFighter.Health <= 0)
             {
                 if (secondFighter.Health <= 0)
                 {
-                    RemoveCombatantSquad(firstFighter, secondFighter);
+                    Console.WriteLine("\nОба бойца погибли на поле боя.");
                 }
                 else
                 {
-                    _firstSquad.RemoveFighterPlatoon(firstFighter);
-
                     Console.WriteLine("\nПобеда бойца - " + secondFighter.Name);
                     Console.ReadKey();
                 }
@@ -106,12 +115,10 @@ namespace OOP10
             {
                 if (firstFighter.Health <= 0)
                 {
-                    RemoveCombatantSquad(firstFighter, secondFighter);
+                    Console.WriteLine("\nОба бойца погибли на поле боя.");
                 }
                 else
                 {
-                    _secondSquad.RemoveFighterPlatoon(secondFighter);
-
                     Console.WriteLine("\nПобеда бойца - " + firstFighter.Name);
                     Console.ReadKey();
                 }
@@ -120,14 +127,37 @@ namespace OOP10
 
         private void RemoveCombatantSquad(Fighter firstFighter, Fighter secondFighter)
         {
-            _firstSquad.RemoveFighterPlatoon(firstFighter);
-            _secondSquad.RemoveFighterPlatoon(secondFighter);
-
-            Console.WriteLine("\nОба бойца погибли на поле боя.");
+            if (firstFighter.Health <= 0)
+            {
+                if (secondFighter.Health <= 0)
+                {
+                    _firstSquad.RemoveFighter(firstFighter);
+                    _secondSquad.RemoveFighter(secondFighter);
+                }
+                else
+                {
+                    _firstSquad.RemoveFighter(firstFighter);
+                }
+            }
+            else if (secondFighter.Health <= 0)
+            {
+                if (firstFighter.Health <= 0)
+                {
+                    _firstSquad.RemoveFighter(firstFighter);
+                    _secondSquad.RemoveFighter(secondFighter);
+                }
+                else
+                {
+                    _secondSquad.RemoveFighter(secondFighter);
+                }
+            }
         }
 
         private void ShowWinningCountry()
         {
+            string firstCountry = "Венгрия";
+            string secondCountry = "Румыния";
+
             if (_firstSquad.Count <= 0 & _secondSquad.Count <= 0)
             {
                 Console.WriteLine("\nНичья. Победила дружба.");
@@ -135,19 +165,19 @@ namespace OOP10
             }
             else if (_firstSquad.Count <= 0)
             {
-                Console.WriteLine($"\nСтрана {_firstSquad.Country} побеждает!");
+                Console.WriteLine($"\nСтрана {firstCountry} побеждает!");
                 return;
             }
             else if (_secondSquad.Count <= 0)
             {
-                Console.WriteLine($"\nСтрана {_secondSquad.Country} побеждает!");
+                Console.WriteLine($"\nСтрана {secondCountry} побеждает!");
                 return;
             }
         }
 
         private void ShowListSquad(Squad squad)
         {
-            Console.WriteLine($"\n{squad.Country}. Список бойцов:");
+            Console.WriteLine($"\nСписок бойцов:");
 
             squad.ShowInfoFighters();
         }
@@ -155,32 +185,32 @@ namespace OOP10
 
     class SquadCreator
     {
-        public Squad CreateFirstSquad(string country)
+        public Squad CreateFirstSquad()
         {
             List<Fighter> firstSquad = new List<Fighter>
             {
-                new Wrestler(nameof(Wrestler), 80, 20, 100),
-                new Kickboxer(nameof(Kickboxer), 60, 15),
-                new Boxer(nameof(Boxer), 50, 20),
-                new SumoWrestler(nameof(SumoWrestler), 55, 15),
+                new Wrestler(nameof(Wrestler), 100, 20, 100),
+                new Kickboxer(nameof(Kickboxer), 80, 15),
+                new Boxer(nameof(Boxer), 70, 20),
+                new SumoWrestler(nameof(SumoWrestler), 90, 15),
             };
 
-            Squad squad = new Squad(firstSquad, country);
+            Squad squad = new Squad(firstSquad);
 
             return squad;
         }
 
-        public Squad CreateSecondSquad(string country)
+        public Squad CreateSecondSquad()
         {
             List<Fighter> secondSquad = new List<Fighter>
             {
-                new Karateka(nameof(Karateka), 50, 22),
-                new TaekwondoPractitioner(nameof(TaekwondoPractitioner), 33, 30),
+                new Karateka(nameof(Karateka), 75, 22),
+                new TaekwondoPractitioner(nameof(TaekwondoPractitioner), 90, 30),
                 new Сapoeirista(nameof(Сapoeirista), 100, 15),
-                new Aikidoka(nameof(Aikidoka), 66, 25),
+                new Aikidoka(nameof(Aikidoka), 80, 25),
             };
 
-            Squad squad = new Squad(secondSquad, country);
+            Squad squad = new Squad(secondSquad);
 
             return squad;
         }
@@ -190,17 +220,14 @@ namespace OOP10
     {
         private List<Fighter> _fighters = new List<Fighter>();
 
-        public Squad(List<Fighter> fighters, string country)
+        public Squad(List<Fighter> fighters)
         {
             _fighters = fighters;
-            Country = country;
         }
-
-        public string Country { get; private set; }
 
         public int Count => _fighters.Count;
 
-        public Fighter GetFighterPlatoon(int index)
+        public Fighter GetFighter(int index)
         {
             if (index >= 0 && index < _fighters.Count)
             {
@@ -219,7 +246,7 @@ namespace OOP10
             }
         }
 
-        public void RemoveFighterPlatoon(Fighter fighter)
+        public void RemoveFighter(Fighter fighter)
         {
             _fighters.Remove(fighter);
         }
@@ -227,19 +254,11 @@ namespace OOP10
 
     abstract class Fighter
     {
-        private List<Fighter> _fighters;
-
         public Fighter(string nameCombatant, int healthCombatant, int damageCombatant)
         {
             Name = nameCombatant;
             Health = healthCombatant;
             Damage = damageCombatant;
-        }
-
-        public Fighter(List<Fighter> fighters, string name)
-        {
-            _fighters = fighters;
-            Name = name;
         }
 
         public int Health { get; protected set; }
@@ -289,13 +308,11 @@ namespace OOP10
 
         private void UseDoubleAttack(Fighter enemy)
         {
-            Random random = new Random();
-
             int activationDoubleAttack = 35;
             int minimumActivationDoubleAttack = 1;
             int maximumActivationDoubleAttack = 100;
 
-            if (activationDoubleAttack > random.Next(minimumActivationDoubleAttack, maximumActivationDoubleAttack))
+            if (activationDoubleAttack > UserUtils.GenerateRandomNumber(minimumActivationDoubleAttack, maximumActivationDoubleAttack))
             {
                 _samboWarriorEndurance -= _usingSkillDoubleAttack;
 
@@ -338,14 +355,12 @@ namespace OOP10
 
         private void RestoreHealth(Fighter enemy)
         {
-            Random random = new Random();
-
             int halfRegenerationHealth = 2;
             int activatingRegenerationHealth = 40;
-            int minimumActivatingRegenerationHealth = 1;
+            int minimumActivatingRegenerationHealth = 1; 
             int maximumActivatingRegenerationHealth = 100;
 
-            if (activatingRegenerationHealth > random.Next(minimumActivatingRegenerationHealth, maximumActivatingRegenerationHealth))
+            if (activatingRegenerationHealth > UserUtils.GenerateRandomNumber(minimumActivatingRegenerationHealth, maximumActivatingRegenerationHealth))
             {
                 int regenerationHealth = enemy.Damage / halfRegenerationHealth;
                 Console.WriteLine(Name + " получает - " + enemy.Damage + " урона и восстанавливает " + regenerationHealth + " здоровья.");
@@ -401,14 +416,12 @@ namespace OOP10
 
         private void UseBleedingDamage(Fighter enemy)
         {
-            Random random = new Random();
-
             int activationBleedingDamage = 40;
             int minimumBleedingDamage = 1;
             int maximumBleedingDamage = 100;
-            int bleedingDamage = random.Next(10, 30);
+            int bleedingDamage = UserUtils.GenerateRandomNumber(10, 30); 
 
-            if (activationBleedingDamage > random.Next(minimumBleedingDamage, maximumBleedingDamage))
+            if (activationBleedingDamage > UserUtils.GenerateRandomNumber(minimumBleedingDamage, maximumBleedingDamage))
             {
                 Console.WriteLine(Name + ", выполняет режущий удар с логтя, у противника кровотечение на - " + bleedingDamage + " урона.");
                 enemy.TakeDamage(bleedingDamage);
@@ -429,13 +442,11 @@ namespace OOP10
 
         private void UseDoublingDamage(Fighter enemy)
         {
-            Random random = new Random();
-
             int activationDoublingAttack = 18;
             int minimumActivationDoublingAttack = 1;
             int maximumActivationDoublingAttack = 100;
 
-            if (activationDoublingAttack > random.Next(minimumActivationDoublingAttack, maximumActivationDoublingAttack))
+            if (activationDoublingAttack > UserUtils.GenerateRandomNumber(minimumActivationDoublingAttack, maximumActivationDoublingAttack))
             {
                 Console.WriteLine($"Урон {Name} удваивается.");
 
@@ -471,24 +482,20 @@ namespace OOP10
 
         private bool TryReflectionDamageFighter()
         {
-            Random random = new Random();
-
             int activationReflectionDamage = 25;
             int minimumValueReflectionDamage = 1;
             int maximumValueReflectionDamage = 100;
 
-            return (activationReflectionDamage > random.Next(minimumValueReflectionDamage, maximumValueReflectionDamage));
+            return (activationReflectionDamage > UserUtils.GenerateRandomNumber(minimumValueReflectionDamage, maximumValueReflectionDamage));
         }
 
         private void UseReflectionDamage(Fighter enemy)
         {
-            Random random = new Random();
-
             int activationReflectionDamage = 30;
             int minimumValueReflectionDamage = 1;
             int maximumValueReflectionDamage = 100;
 
-            if (activationReflectionDamage > random.Next(minimumValueReflectionDamage, maximumValueReflectionDamage))
+            if (activationReflectionDamage > UserUtils.GenerateRandomNumber(minimumValueReflectionDamage, maximumValueReflectionDamage))
             {
                 Console.WriteLine(Name + " отражает атаку противника на " + enemy.Damage + " урона.");
                 enemy.TakeDamage(enemy.Damage);
@@ -514,14 +521,12 @@ namespace OOP10
 
         private void UseCriticalDamage(Fighter enemy)
         {
-            Random random = new Random();
-
             int activationCriticalDamage = 10;
             int minimumActivationCriticalDamage = 1;
             int maximumActivationCriticalDamage = 100;
             int damage = 10;
 
-            if (activationCriticalDamage > random.Next(minimumActivationCriticalDamage, maximumActivationCriticalDamage))
+            if (activationCriticalDamage > UserUtils.GenerateRandomNumber(minimumActivationCriticalDamage, maximumActivationCriticalDamage))
             {
                 int criticalDamage = damage * Damage;
 
@@ -549,14 +554,12 @@ namespace OOP10
 
         private void UseReverseDamage(Fighter enemy)
         {
-            Random random = new Random();
-
             int activationReverseDamage = 25;
             int minimumActivationReverseDamage = 1;
             int maximumActivationReverseDamage = 100;
             int damage = 2;
 
-            if (activationReverseDamage > random.Next(minimumActivationReverseDamage, maximumActivationReverseDamage))
+            if (activationReverseDamage > UserUtils.GenerateRandomNumber(minimumActivationReverseDamage, maximumActivationReverseDamage))
             {
                 int reverseDamage = damage * Damage;
 
