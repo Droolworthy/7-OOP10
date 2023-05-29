@@ -12,7 +12,6 @@ namespace OOP10
 
             Squad firstPlatoon = new(firstSquad);
             Squad secondPlatoon = new(secondSquad);
-
             Arena arena = new Arena(firstPlatoon, secondPlatoon);
 
             bool isWorking = true;
@@ -201,18 +200,6 @@ namespace OOP10
 
         public int Count => _fighters.Count;
 
-        public void Fill(List<Fighter> fighters)
-        {
-            fighters.Add(new Wrestler(nameof(Wrestler), 100, 20, 100));
-            fighters.Add(new Kickboxer(nameof(Kickboxer), 80, 15));
-            fighters.Add(new Boxer(nameof(Boxer), 70, 20));
-            fighters.Add(new SumoWrestler(nameof(SumoWrestler), 90, 15));
-            fighters.Add(new Karateka(nameof(Karateka), 75, 22));
-            fighters.Add(new TaekwondoPractitioner(nameof(TaekwondoPractitioner), 90, 30));
-            fighters.Add(new Сapoeirista(nameof(Сapoeirista), 100, 15));
-            fighters.Add(new Aikidoka(nameof(Aikidoka), 80, 25));
-        }
-
         public Fighter GetFighter(int index)
         {
             if (index >= 0 && index < _fighters.Count)
@@ -235,6 +222,18 @@ namespace OOP10
         public void RemoveFighter(Fighter fighter)
         {
             _fighters.Remove(fighter);
+        }
+
+        private void Fill(List<Fighter> fighters)
+        {
+            fighters.Add(new Wrestler(nameof(Wrestler), 100, 20, 100));
+            fighters.Add(new Kickboxer(nameof(Kickboxer), 80, 15));
+            fighters.Add(new Boxer(nameof(Boxer), 70, 20));
+            fighters.Add(new SumoWrestler(nameof(SumoWrestler), 90, 15));
+            fighters.Add(new Karateka(nameof(Karateka), 75, 22));
+            fighters.Add(new TaekwondoPractitioner(nameof(TaekwondoPractitioner), 90, 30));
+            fighters.Add(new Сapoeirista(nameof(Сapoeirista), 100, 15));
+            fighters.Add(new Aikidoka(nameof(Aikidoka), 80, 25));
         }
     }
 
