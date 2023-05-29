@@ -7,7 +7,13 @@ namespace OOP10
             const string CommandFightFighters = "1";
             const string CommandExit = "2";
 
-            Arena arena = new Arena();
+            List<Fighter> firstSquad = new List<Fighter>();
+            List<Fighter> secondSquad = new List<Fighter>();
+
+            Squad firstPlatoon = new(firstSquad);
+            Squad secondPlatoon = new(secondSquad);
+
+            Arena arena = new Arena(firstPlatoon, secondPlatoon);
 
             bool isWorking = true;
 
@@ -48,12 +54,11 @@ namespace OOP10
     {
         private Squad _firstSquad;
         private Squad _secondSquad;
-        private SquadCreator _creator = new SquadCreator();
 
-        public Arena()
+        public Arena(Squad firstSquad, Squad secondSquad)
         {
-            _firstSquad = _creator.CreateFirstSquad();
-            _secondSquad = _creator.CreateSecondSquad();
+            _firstSquad = firstSquad;
+            _secondSquad = secondSquad;
         }
 
         public void Fight()
@@ -183,39 +188,6 @@ namespace OOP10
         }
     }
 
-    class SquadCreator
-    {
-        public Squad CreateFirstSquad()
-        {
-            List<Fighter> firstSquad = new List<Fighter>
-            {
-                new Wrestler(nameof(Wrestler), 100, 20, 100),
-                new Kickboxer(nameof(Kickboxer), 80, 15),
-                new Boxer(nameof(Boxer), 70, 20),
-                new SumoWrestler(nameof(SumoWrestler), 90, 15),
-            };
-
-            Squad squad = new Squad(firstSquad);
-
-            return squad;
-        }
-
-        public Squad CreateSecondSquad()
-        {
-            List<Fighter> secondSquad = new List<Fighter>
-            {
-                new Karateka(nameof(Karateka), 75, 22),
-                new TaekwondoPractitioner(nameof(TaekwondoPractitioner), 90, 30),
-                new Сapoeirista(nameof(Сapoeirista), 100, 15),
-                new Aikidoka(nameof(Aikidoka), 80, 25),
-            };
-
-            Squad squad = new Squad(secondSquad);
-
-            return squad;
-        }
-    }
-
     class Squad
     {
         private List<Fighter> _fighters = new List<Fighter>();
@@ -223,9 +195,23 @@ namespace OOP10
         public Squad(List<Fighter> fighters)
         {
             _fighters = fighters;
+
+            Fill(fighters);
         }
 
         public int Count => _fighters.Count;
+
+        public void Fill(List<Fighter> fighters)
+        {
+            fighters.Add(new Wrestler(nameof(Wrestler), 100, 20, 100));
+            fighters.Add(new Kickboxer(nameof(Kickboxer), 80, 15));
+            fighters.Add(new Boxer(nameof(Boxer), 70, 20));
+            fighters.Add(new SumoWrestler(nameof(SumoWrestler), 90, 15));
+            fighters.Add(new Karateka(nameof(Karateka), 75, 22));
+            fighters.Add(new TaekwondoPractitioner(nameof(TaekwondoPractitioner), 90, 30));
+            fighters.Add(new Сapoeirista(nameof(Сapoeirista), 100, 15));
+            fighters.Add(new Aikidoka(nameof(Aikidoka), 80, 25));
+        }
 
         public Fighter GetFighter(int index)
         {
@@ -357,7 +343,7 @@ namespace OOP10
         {
             int halfRegenerationHealth = 2;
             int activatingRegenerationHealth = 40;
-            int minimumActivatingRegenerationHealth = 1; 
+            int minimumActivatingRegenerationHealth = 1;
             int maximumActivatingRegenerationHealth = 100;
 
             if (activatingRegenerationHealth > UserUtils.GenerateRandomNumber(minimumActivatingRegenerationHealth, maximumActivatingRegenerationHealth))
@@ -419,7 +405,7 @@ namespace OOP10
             int activationBleedingDamage = 40;
             int minimumBleedingDamage = 1;
             int maximumBleedingDamage = 100;
-            int bleedingDamage = UserUtils.GenerateRandomNumber(10, 30); 
+            int bleedingDamage = UserUtils.GenerateRandomNumber(10, 30);
 
             if (activationBleedingDamage > UserUtils.GenerateRandomNumber(minimumBleedingDamage, maximumBleedingDamage))
             {
